@@ -4,26 +4,18 @@ import { revalidatePath } from 'next/cache';
 import connectDB from './mongodb';
 import { Task } from '../models/Task';
 import { ITask } from '../types';
+import { serializeData } from './utils';
+
 
 export async function getTasks() {
   try {
     await connectDB();
-    const tasks = await Task.find({}).sort({ createdAt: -1 }).lean();
-
-    // Convert _id from ObjectId to string and ensure TypeScript knows the type
-    const serializedTasks = tasks.map((task: { _id: any }) => ({
-      ...task,
-      _id: task._id.toString(), // Ensure _id is a string
-    }));
-
-    return serializedTasks;
-  } catch (error: unknown) {
-    console.error('Failed to fetch tasks:', error);
-    throw new Error('Failed to fetch tasks. Please try again later.');
+    const tasks = await Task.find({}).sort({ createdAt: -1 });
+    return serializeData(tasks);
+  } catch (error) {
+    throw new Error('Failed to fetch tasks');
   }
 }
-
-
 
 export async function addTask(formData: FormData) {
   try {
