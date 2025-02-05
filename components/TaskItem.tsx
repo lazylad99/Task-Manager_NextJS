@@ -12,18 +12,19 @@ export default function TaskItem({ task }: { task: ITask }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleUpdate = async () => {
-    await updateTask(task._id!, editedTask);
+    await updateTask(task._id!.toString(), editedTask);
     setIsEditing(false);
   };
-
+  
   const handleToggleComplete = async () => {
-    await updateTask(task._id!, { ...task, completed: !task.completed });
+    await updateTask(task._id!.toString(), { ...task, completed: !task.completed });
   };
-
+  
   const handleDelete = async () => {
     setIsDeleting(true);
-    await deleteTask(task._id!);
+    await deleteTask(task._id!.toString());
   };
+  
 
   if (isEditing) {
     return (
