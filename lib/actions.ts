@@ -12,7 +12,8 @@ export async function getTasks() {
     await connectDB();
     const tasks = await Task.find({}).sort({ createdAt: -1 });
     return serializeData(tasks);
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Failed to create task:', error);
     throw new Error('Failed to fetch tasks');
   }
 }
