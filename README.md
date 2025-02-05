@@ -2,7 +2,8 @@
 
 A modern task management application built with Next.js, MongoDB, and Server Actions. Manage your tasks with a beautiful and intuitive interface.
 
-![Task Management App](https://via.placeholder.com/800x400)
+![Dashboard](https://github.com/lazylad99/Task-Manager_NextJS/blob/main/assets/Screenshot.png)
+
 
 ## Features
 
