@@ -6,20 +6,19 @@ if (!process.env.MONGODB_URI) {
 
 const MONGODB_URI: string = process.env.MONGODB_URI;
 
-// Extend globalThis to include a mongoose property
+// Extend globalThis to include a mongoose property without using namespace
 declare global {
-  namespace NodeJS {
-    interface Global {
-      mongoose?: {
-        conn: mongoose.Connection | null;
-        promise: Promise<mongoose.Connection> | null;
-      };
-    }
+  interface GlobalMongoose {
+    conn: mongoose.Connection | null;
+    promise: Promise<mongoose.Connection> | null;
   }
 }
 
-// Use globalThis instead of global
-const cached = (globalThis as any).mongoose || ((globalThis as any).mongoose = { conn: null, promise: null });
+// Ensure correct typing for cached mongoose instance
+const globalWithMongoose = globalThis as unknown as { mongoose?: GlobalMongoose };
+
+// Use a properly typed cached object
+const cached: GlobalMongoose = globalWithMongoose.mongoose || (globalWithMongoose.mongoose = { conn: null, promise: null });
 
 async function connectDB(): Promise<mongoose.Connection> {
   if (cached.conn) {
