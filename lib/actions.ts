@@ -4,17 +4,25 @@ import { revalidatePath } from 'next/cache';
 import connectDB from './mongodb';
 import { Task } from '../models/Task';
 import { ITask } from '../types';
-import { serializeData } from './utils';
 
 export async function getTasks() {
   try {
     await connectDB();
-    const tasks = await Task.find({}).sort({ createdAt: -1 });
-    return serializeData(tasks);
-  } catch (error) {
-    throw new Error('Failed to fetch tasks');
+    const tasks = await Task.find({}).sort({ createdAt: -1 }).lean();
+
+    // Convert _id from ObjectId to string and ensure TypeScript knows the type
+    const serializedTasks = tasks.map((task: { _id: any }) => ({
+      ...task,
+      _id: task._id.toString(), // Ensure _id is a string
+    }));
+
+    return serializedTasks;
+  } catch (error: unknown) {
+    console.error('Failed to fetch tasks:', error);
+    throw new Error('Failed to fetch tasks. Please try again later.');
   }
 }
+
 
 
 export async function addTask(formData: FormData) {
@@ -30,8 +38,9 @@ export async function addTask(formData: FormData) {
 
     await Task.create(task);
     revalidatePath('/');
-  } catch (error) {
-    throw new Error('Failed to create task');
+  } catch (error: unknown) {
+    console.error('Failed to create task:', error);
+    throw new Error('Failed to create task. Please try again later.');
   }
 }
 
@@ -40,8 +49,9 @@ export async function updateTask(id: string, updates: Partial<ITask>) {
     await connectDB();
     await Task.findByIdAndUpdate(id, updates);
     revalidatePath('/');
-  } catch (error) {
-    throw new Error('Failed to update task');
+  } catch (error: unknown) {
+    console.error('Failed to update task:', error);
+    throw new Error('Failed to update task. Please try again later.');
   }
 }
 
@@ -50,7 +60,8 @@ export async function deleteTask(id: string) {
     await connectDB();
     await Task.findByIdAndDelete(id);
     revalidatePath('/');
-  } catch (error) {
-    throw new Error('Failed to delete task');
+  } catch (error: unknown) {
+    console.error('Failed to delete task:', error);
+    throw new Error('Failed to delete task. Please try again later.');
   }
 }

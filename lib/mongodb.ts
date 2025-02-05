@@ -6,16 +6,20 @@ if (!process.env.MONGODB_URI) {
 
 const MONGODB_URI: string = process.env.MONGODB_URI;
 
-// Extend the global object to store the cached connection
+// Extend globalThis to include a mongoose property
 declare global {
-  var mongoose: {
-    conn: mongoose.Connection | null;
-    promise: Promise<mongoose.Connection> | null;
-  };
+  namespace NodeJS {
+    interface Global {
+      mongoose?: {
+        conn: mongoose.Connection | null;
+        promise: Promise<mongoose.Connection> | null;
+      };
+    }
+  }
 }
 
-// Check if the cache exists, if not, initialize it
-let cached = global.mongoose || (global.mongoose = { conn: null, promise: null });
+// Use globalThis instead of global
+const cached = (globalThis as any).mongoose || ((globalThis as any).mongoose = { conn: null, promise: null });
 
 async function connectDB(): Promise<mongoose.Connection> {
   if (cached.conn) {

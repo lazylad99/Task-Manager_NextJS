@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { addTask } from '@/lib/actions';
-import { Calendar, Clock, FileText, PlusCircle } from 'lucide-react';
+import { Calendar, FileText, PlusCircle } from 'lucide-react';
 
 export default function TaskForm() {
   const [isLoading, setIsLoading] = useState(false);
